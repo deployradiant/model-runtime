@@ -1,0 +1,134 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Create and publish a Docker image
+
+on:
+  release:
+    types: [published]
+  push:
+    branches: ["jf/230802-add-vllm-back"]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: onpremwrapper
+  ECR_REPOSITORY_PUBLIC: radiant-worker
+  ECR_REGISTRY_PUBLIC: public.ecr.aws/p2j7k7r4
+
+jobs:
+  build-and-push-image:
+    runs-on: large-runner-onpremwrapper
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Remove unnecessary files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf ${GITHUB_WORKSPACE}/.git
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set env
+        run: echo "GIT_VERSION=$(git describe --tags --always --first-parent) " >> $GITHUB_ENV
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{raw}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }}, ghcr.io/deployradiant/onpremwrapper:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+
+  build-and-push-image-ecr-public:
+    needs: build-and-push-image
+    runs-on: large-runner-onpremwrapper
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      AWS_REGION: us-east-1
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set env
+        run: echo "GIT_VERSION=$(git describe --tags --always --first-parent) " >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: 'public'
+
+      - name: Pull image from GitHub Packages
+        run: docker pull ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }}
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image_tag
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker image tag ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }} $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}
+          docker push $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}
+          echo "image=$ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}" >> $GITHUB_OUTPUT
+
+      - name: Pull image from GitHub Packages
+        if: "!contains(env.GIT_VERSION, '-rc')"
+        run: docker pull ghcr.io/deployradiant/onpremwrapper:latest
+
+      - name: Build, tag, and push image to Amazon ECR IFF latest
+        if: "!contains(env.GIT_VERSION, '-rc')"
+        id: build-image_latest
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker image tag ghcr.io/deployradiant/onpremwrapper:latest $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest
+          docker push $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest
+          echo "image=$ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest" >> $GITHUB_OUTPUT

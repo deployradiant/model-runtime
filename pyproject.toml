@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Jakob Frick <jakob.maria.frick@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ninja = "^1.11.1"
+pynvml = "^11.5.0"
+gradio = ">=3.17.1"
+fastapi = "^0.95.1"
+pydantic = "^1.10.7"
+uvicorn = "^0.21.1"
+sentence-transformers = "^2.2.2"
+einops = "^0.6.1"
+jsonformer = "^0.12.0"
+optimum = "^1.8.8"
+bitsandbytes = "^0.39.1"
+ctransformers = "^0.2.23"
+torch = "2.0.1+cu118"
+boto3 = "^1.28.16"
+trl = "^0.4.7"
+peft = "^0.4.0"
+wandb = "^0.15.8"
+setuptools = "^68.0.0"
+sse-starlette = "^1.6.1"
+transformers = "^4.34.1"
+accelerate = "^0.24.1"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/"
+priority = "supplemental"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "app.app:server"
+

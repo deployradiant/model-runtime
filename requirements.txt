@@ -1,0 +1,16 @@
+torch
+ninja
+tokenizers
+rwkv==0.6.2
+pynvml
+huggingface_hub
+gradio>=3.17.1
+fastapi
+pydantic
+transformers
+uvicorn
+InstructorEmbedding
+sentence_transformers
+accelerate
+jsonformer
+sse-starlette
