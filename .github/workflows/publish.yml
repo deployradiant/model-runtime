@@ -12,15 +12,12 @@ name: Create and publish a Docker image
 on:
   release:
     types: [published]
-  push:
-    branches: ["jf/230802-add-vllm-back"]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   AWS_REGION: us-east-2
-  ECR_REPOSITORY: onpremwrapper
-  ECR_REPOSITORY_PUBLIC: radiant-worker
+  ECR_REPOSITORY_PUBLIC: model-runtime
   ECR_REGISTRY_PUBLIC: public.ecr.aws/p2j7k7r4
 
 jobs:
@@ -67,7 +64,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }}, ghcr.io/deployradiant/onpremwrapper:latest
+          tags: ghcr.io/deployradiant/model-runtime:${{ env.GIT_VERSION }}, ghcr.io/deployradiant/onpremwrapper:latest
           labels: ${{ steps.meta.outputs.labels }}
 
 
@@ -108,20 +105,20 @@ jobs:
           registry-type: 'public'
 
       - name: Pull image from GitHub Packages
-        run: docker pull ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }}
+        run: docker pull ghcr.io/deployradiant/model-runtime:${{ env.GIT_VERSION }}
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image_tag
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker image tag ghcr.io/deployradiant/onpremwrapper:${{ env.GIT_VERSION }} $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}
+          docker image tag ghcr.io/deployradiant/model-runtime:${{ env.GIT_VERSION }} $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}
           docker push $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}
           echo "image=$ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:${{ env.GIT_VERSION }}" >> $GITHUB_OUTPUT
 
       - name: Pull image from GitHub Packages
         if: "!contains(env.GIT_VERSION, '-rc')"
-        run: docker pull ghcr.io/deployradiant/onpremwrapper:latest
+        run: docker pull ghcr.io/deployradiant/model-runtime:latest
 
       - name: Build, tag, and push image to Amazon ECR IFF latest
         if: "!contains(env.GIT_VERSION, '-rc')"
@@ -129,6 +126,6 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker image tag ghcr.io/deployradiant/onpremwrapper:latest $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest
+          docker image tag ghcr.io/deployradiant/model-runtime:latest $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest
           docker push $ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest
           echo "image=$ECR_REGISTRY_PUBLIC/$ECR_REPOSITORY_PUBLIC:latest" >> $GITHUB_OUTPUT
