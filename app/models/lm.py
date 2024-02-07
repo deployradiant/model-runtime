@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, TypeVar
 from app.health import set_readiness
-from app.s3 import load_model_from_s3
+from app.s3 import get_s3_bucket, load_model_from_s3
 from app.config import config
 import gc
 
@@ -15,7 +15,12 @@ class LM(ABC):
         self._handle_init(model_name, has_tokenizer, load_from_s3)
         set_readiness(True)
 
-    def _handle_init(self, model_name: str, has_tokenizer=True, load_from_s3=True):
+    def _handle_init(
+        self,
+        model_name: str,
+        has_tokenizer=True,
+        load_from_s3=get_s3_bucket() is not None,
+    ):
         self.model_name = model_name
         if load_from_s3:
             self.model_cache, self.tokenizer_cache = load_model_from_s3(
