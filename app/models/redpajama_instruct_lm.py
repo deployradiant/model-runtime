@@ -2,7 +2,6 @@ from typing import Any, Dict, List
 import os
 from app.models.lm import LM
 from app.models.text_generation_lm import TextGenerationLM
-from .dollyv2_lm import LanguageGeneratorLmDolly
 import torch
 from jsonformer import Jsonformer
 import transformers
