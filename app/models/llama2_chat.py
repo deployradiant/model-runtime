@@ -76,7 +76,7 @@ class LLama2ChatLM(TextGenerationLM):
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
                     do_sample=temperature == 0,
-                    temperature=temperature,
+                    temperature=temperature if temperature != 0.0 else None,
                     streamer=streamer,
                 )
                 t = Thread(target=self.model.generate, kwargs=kwargs)
@@ -88,7 +88,7 @@ class LLama2ChatLM(TextGenerationLM):
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
                     do_sample=temperature == 0,
-                    temperature=temperature,
+                    temperature=temperature if temperature != 0.0 else None,
                 )
                 out_text = self.tokenizer.decode(
                     tokenized_output[0], skip_special_tokens=True
