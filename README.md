@@ -99,3 +99,13 @@ pip3 install install flash-attn==2.3.1.post1 --no-build-isolation
 pip3 install "transformers[torch]"
 ```
 
+## Questions?
+
+Create an issue or discussion in this repository.
+
+Or, reach out to our team! [@jakob_frick](https://twitter.com/frick_jakob/), [@__anjor](https://twitter.com/__anjor), [@maxnajork](https://twitter.com/maxnajork) on X or [team@radiantai.com](mailto:team@radiantai.com).
+
+## Contributing Guidelines
+
+Thank you for your interest in contributing to our project! Before you begin writing code, it would be helpful if you read these [contributing guidelines](CONTRIBUTING.md). Following them will make the contribution process easier and more efficient for everyone involved.
+
