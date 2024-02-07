@@ -57,7 +57,7 @@ class LanguageGeneratorLmRedpajama(TextGenerationLM):
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=max_tokens,
-            do_sample=False,
+            do_sample=temperature == 0,
             return_dict_in_generate=True,
         )
         token = outputs.sequences[0, input_length:]

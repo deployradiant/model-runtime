@@ -60,7 +60,7 @@ class LanguageGeneratorLmMosaic(TextGenerationLM):
 
         with torch.autocast("cuda", dtype=torch.float16):
             out_text = self.pipeline(
-                in_text, max_new_tokens=248, do_sample=False, use_cache=True
+                in_text, max_new_tokens=248, do_sample=temperature == 0, use_cache=True
             )
             out_text = out_text[0]["generated_text"]
 

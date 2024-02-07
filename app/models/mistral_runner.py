@@ -73,7 +73,7 @@ class MistralRunner(TextGenerationLM):
                     input_ids=tokenized_inputs.input_ids,
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
-                    do_sample=False if temperature == 0.0 else True,
+                    do_sample=temperature == 0,
                     temperature=temperature,
                     streamer=streamer,
                 )
@@ -85,7 +85,7 @@ class MistralRunner(TextGenerationLM):
                     input_ids=tokenized_inputs.input_ids,
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
-                    do_sample=False if temperature == 0.0 else True,
+                    do_sample=temperature == 0,
                     temperature=temperature,
                 )
                 out_text = self.tokenizer.decode(
