@@ -10,7 +10,7 @@ import hashlib
 MODEL_BUCKET_REGION_NAME: str = os.getenv("MODEL_BUCKET_REGION_NAME", "us-east-1")
 MODEL_BUCKET_ACCESS_KEY: str = os.getenv("MODEL_BUCKET_ACCESS_KEY")
 MODEL_BUCKET_SECRET_KEY: str = os.getenv("MODEL_BUCKET_SECRET_KEY")
-MODEL_BUCKET_NAME = os.getenv("MODEL_BUCKET_NAME")
+MODEL_BUCKET_NAME = os.getenv("MODEL_BUCKET_NAME", None)
 
 
 s3_bucket = None
@@ -20,6 +20,7 @@ FINETUNED_MODEL_FOLDER = "finetuned"
 
 def get_s3_bucket():
     global s3_bucket
+
     if s3_bucket is None and MODEL_BUCKET_NAME is not None:
         s3_bucket = boto3.resource(
             service_name="s3",
