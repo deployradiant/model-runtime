@@ -214,7 +214,7 @@ def init_model_provider():
         for name in cls.get_model_names():
             available_models.append(name)
 
-    print(available_models)
+    print("Found available models:", available_models)
     text_generation_model, embedding_model = None, None
     if not config.is_text_generation_disabled():
         text_generation_model = config.get_text_generation_model()

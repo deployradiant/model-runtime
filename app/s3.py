@@ -20,6 +20,7 @@ FINETUNED_MODEL_FOLDER = "finetuned"
 
 def get_s3_bucket():
     global s3_bucket
+    print("s3_bucket", s3_bucket, MODEL_BUCKET_NAME)
 
     if s3_bucket is None and MODEL_BUCKET_NAME is not None:
         s3_bucket = boto3.resource(
