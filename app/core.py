@@ -10,7 +10,6 @@ from .models.lm import LM
 
 
 if not config.is_cpu_mode():
-    from app.models.dollyv2_large_lm import LanguageGeneratorLmDollyLarge
     from .models.dollyv2_lm import LanguageGeneratorLmDolly
     from .models.redpajama_instruct_lm import LanguageGeneratorLmRedpajama
     from app.models.finetuned_lm import FinetunedTextGenerationLm
@@ -23,7 +22,6 @@ if not config.is_cpu_mode():
         E5LargeV2,
         LLama2ChatLM,
         LanguageGeneratorLmDolly,
-        LanguageGeneratorLmDollyLarge,
         LanguageGeneratorLmRedpajama,
         MistralRunner,
         Ollama,
@@ -226,12 +224,12 @@ def init_model_provider():
         embedding_model = config.get_embedding_model()
 
     model_provider = ModelProvider(
-        text_generation_model=text_generation_model
-        if text_generation_model in available_models
-        else None,
-        embedding_model=embedding_model
-        if embedding_model in available_models
-        else None,
+        text_generation_model=(
+            text_generation_model if text_generation_model in available_models else None
+        ),
+        embedding_model=(
+            embedding_model if embedding_model in available_models else None
+        ),
     )
 
 

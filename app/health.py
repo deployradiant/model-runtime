@@ -6,9 +6,11 @@ router = APIRouter(prefix="/health")
 # Hack to share the readiness state between uvicorn workers
 READINESS_FILEPATH = "/tmp/readiness"
 
+
 @router.get("/liveness", status_code=status.HTTP_200_OK)
 def get_liveness():
     return "OK"
+
 
 @router.get("/readiness", status_code=status.HTTP_200_OK)
 def get_readiness(response: Response):
@@ -24,9 +26,11 @@ def get_readiness(response: Response):
         return
     return "OK"
 
+
 def set_readiness(new_readiness: bool):
     with open(READINESS_FILEPATH, "w") as f:
         f.write(str(new_readiness))
+
 
 def get_readiness_filepath():
     return READINESS_FILEPATH

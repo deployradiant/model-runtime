@@ -59,8 +59,6 @@ class LanguageGeneratorLmDolly(TextGenerationLM):
 
     def ensure_max_tokens(self, prompt: str, max_tokens: int) -> str:
         prompt = prompt.strip()
-        print("Prompt is ", prompt)
-        print("Prompt length is ", len(prompt))
         prompt_lines = prompt.split("\n")
         total_tokens = 0
 

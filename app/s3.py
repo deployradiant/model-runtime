@@ -20,7 +20,7 @@ FINETUNED_MODEL_FOLDER = "finetuned"
 
 def get_s3_bucket():
     global s3_bucket
-    if s3_bucket is None:
+    if s3_bucket is None and MODEL_BUCKET_NAME is not None:
         s3_bucket = boto3.resource(
             service_name="s3",
             region_name=MODEL_BUCKET_REGION_NAME,
@@ -31,6 +31,8 @@ def get_s3_bucket():
 
 
 def get_s3_file_hash(key: str):
+    if MODEL_BUCKET_NAME is None:
+        return None
     return (
         boto3.client(
             service_name="s3",
@@ -44,6 +46,8 @@ def get_s3_file_hash(key: str):
 
 
 def get_s3_file_size(key: str):
+    if MODEL_BUCKET_NAME is None:
+        return None
     return boto3.client(
         service_name="s3",
         region_name=MODEL_BUCKET_REGION_NAME,
