@@ -10,7 +10,6 @@ from .models.lm import LM
 
 
 if not config.is_cpu_mode():
-    from .models.dollyv2_lm import LanguageGeneratorLmDolly
     from .models.redpajama_instruct_lm import LanguageGeneratorLmRedpajama
     from app.models.finetuned_lm import FinetunedTextGenerationLm
     from app.models.llama2_chat import LLama2ChatLM
@@ -21,7 +20,6 @@ if not config.is_cpu_mode():
     AVAILABLE_MODELS = [
         E5LargeV2,
         LLama2ChatLM,
-        LanguageGeneratorLmDolly,
         LanguageGeneratorLmRedpajama,
         MistralRunner,
         Ollama,
