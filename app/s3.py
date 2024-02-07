@@ -123,6 +123,9 @@ def load_model_from_s3(
 
 
 def list_finetuned_models_from_s3() -> List[FinetunedModelConfig]:
+    if FINETUNED_MODEL_FOLDER is None:
+        return []
+
     regex = re.compile(f"{FINETUNED_MODEL_FOLDER}/.+?/config.json")
     bucket = get_s3_bucket()
     finetuned_model_configs = bucket.objects.filter(
