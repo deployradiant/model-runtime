@@ -67,7 +67,6 @@ def load_model_from_s3(
 ) -> Tuple[Optional[str], Optional[str]]:
     bucket = get_s3_bucket()
     local_cache_folder = os.path.join(os.path.expanduser("~"), ".cache", "radiant")
-    model_cache_path, tokenizer_cache_path = None, None
     model_path, tokenizer_path = None, None
 
     folders_to_load = ["model"]
