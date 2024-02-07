@@ -71,12 +71,12 @@ def init_model():
 
 def server():
     global LM_MODEL_TYPE
-    parser = argparse.ArgumentParser(description="Radiant platform on premise wrapper")
+    parser = argparse.ArgumentParser(description="Radiant platform model runtime")
     parser.add_argument(
-        "--port", type=int, default=8001, help="port to run the server on"
+        "--port", type=int, default=8001, help="Port to run the runtime on"
     )
     parser.add_argument(
-        "--model_type", type=str, default=None, help="model type to run"
+        "--model_type", type=str, default=None, help="Model type to run"
     )
     parser.add_argument(
         "--cpu",

@@ -10,7 +10,7 @@ import hashlib
 MODEL_BUCKET_REGION_NAME: str = os.getenv("MODEL_BUCKET_REGION_NAME", "us-east-1")
 MODEL_BUCKET_ACCESS_KEY: str = os.getenv("MODEL_BUCKET_ACCESS_KEY")
 MODEL_BUCKET_SECRET_KEY: str = os.getenv("MODEL_BUCKET_SECRET_KEY")
-MODEL_BUCKET_NAME = os.getenv("MODEL_BUCKET_NAME")
+MODEL_BUCKET_NAME = os.getenv("MODEL_BUCKET_NAME", None)
 
 
 s3_bucket = None
@@ -20,7 +20,8 @@ FINETUNED_MODEL_FOLDER = "finetuned"
 
 def get_s3_bucket():
     global s3_bucket
-    if s3_bucket is None:
+
+    if s3_bucket is None and MODEL_BUCKET_NAME is not None:
         s3_bucket = boto3.resource(
             service_name="s3",
             region_name=MODEL_BUCKET_REGION_NAME,
@@ -31,6 +32,8 @@ def get_s3_bucket():
 
 
 def get_s3_file_hash(key: str):
+    if MODEL_BUCKET_NAME is None:
+        return None
     return (
         boto3.client(
             service_name="s3",
@@ -44,6 +47,8 @@ def get_s3_file_hash(key: str):
 
 
 def get_s3_file_size(key: str):
+    if MODEL_BUCKET_NAME is None:
+        return None
     return boto3.client(
         service_name="s3",
         region_name=MODEL_BUCKET_REGION_NAME,
@@ -63,7 +68,6 @@ def load_model_from_s3(
 ) -> Tuple[Optional[str], Optional[str]]:
     bucket = get_s3_bucket()
     local_cache_folder = os.path.join(os.path.expanduser("~"), ".cache", "radiant")
-    model_cache_path, tokenizer_cache_path = None, None
     model_path, tokenizer_path = None, None
 
     folders_to_load = ["model"]
@@ -121,6 +125,9 @@ def load_model_from_s3(
 def list_finetuned_models_from_s3() -> List[FinetunedModelConfig]:
     regex = re.compile(f"{FINETUNED_MODEL_FOLDER}/.+?/config.json")
     bucket = get_s3_bucket()
+    if bucket is None or FINETUNED_MODEL_FOLDER is None:
+        return []
+
     finetuned_model_configs = bucket.objects.filter(
         Prefix=f"{FINETUNED_MODEL_FOLDER}",
     )

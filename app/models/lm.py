@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, TypeVar
 from app.health import set_readiness
-from app.s3 import load_model_from_s3
+from app.s3 import get_s3_bucket, load_model_from_s3
 from app.config import config
 import gc
 
@@ -10,12 +10,22 @@ if not config.is_cpu_mode():
 
 
 class LM(ABC):
-    def __init__(self, model_name: str, has_tokenizer=True, load_from_s3=True):
+    def __init__(
+        self,
+        model_name: str,
+        has_tokenizer=True,
+        load_from_s3=get_s3_bucket() is not None,
+    ):
         set_readiness(False)
         self._handle_init(model_name, has_tokenizer, load_from_s3)
         set_readiness(True)
 
-    def _handle_init(self, model_name: str, has_tokenizer=True, load_from_s3=True):
+    def _handle_init(
+        self,
+        model_name: str,
+        has_tokenizer=True,
+        load_from_s3=get_s3_bucket() is not None,
+    ):
         self.model_name = model_name
         if load_from_s3:
             self.model_cache, self.tokenizer_cache = load_model_from_s3(
@@ -42,9 +52,9 @@ class LM(ABC):
         raise NotImplementedError()
 
     def reset(self):
-        if self.model is not None:
+        if hasattr(self, "model") and self.model is not None:
             del self.model
-        if self.tokenizer is not None:
+        if hasattr(self, "tokenizer") and self.tokenizer is not None:
             del self.tokenizer
         gc.collect()
         if not config.is_cpu_mode():

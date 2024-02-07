@@ -38,7 +38,6 @@ class LLama2ChatLM(TextGenerationLM):
             self.model_name,
             revision=self.model_version,
             use_fast=True,
-            use_auth_token=True,
         )
 
         self.model = AutoModelForCausalLM.from_pretrained(
@@ -46,11 +45,10 @@ class LLama2ChatLM(TextGenerationLM):
             revision=self.model_version,
             torch_dtype=torch.bfloat16,
             trust_remote_code=True,
-            use_auth_token=True,
             rope_scaling={
                 "type": "dynamic",
                 "factor": 2.0,
-            },  # • >4k tokens use_auth_token=True
+            },
         )
         self.model.to("cuda:0")
 
@@ -77,7 +75,7 @@ class LLama2ChatLM(TextGenerationLM):
                     input_ids=tokenized_inputs.input_ids,
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
-                    do_sample=False if temperature == 0.0 else True,
+                    do_sample=temperature == 0,
                     temperature=temperature,
                     streamer=streamer,
                 )
@@ -89,7 +87,7 @@ class LLama2ChatLM(TextGenerationLM):
                     input_ids=tokenized_inputs.input_ids,
                     attention_mask=tokenized_inputs.attention_mask,
                     max_new_tokens=max_tokens,
-                    do_sample=False if temperature == 0.0 else True,
+                    do_sample=temperature == 0,
                     temperature=temperature,
                 )
                 out_text = self.tokenizer.decode(

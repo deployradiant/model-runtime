@@ -1,11 +1,11 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
+from app.models.text_generation_lm import TextGenerationLM
 from transformers import (
     AutoConfig,
     AutoTokenizer,
     pipeline,
     AutoModelForCausalLM,
 )
-from .dollyv2_lm import LanguageGeneratorLmDolly
 import torch
 
 
@@ -13,10 +13,14 @@ MODEL_NAME = "mosaicml/mpt-7b-instruct"
 MODEL_VERSION = "bbe7a55d70215e16c00c1825805b81e4badb57d7"
 
 
-class LanguageGeneratorLmMosaic(LanguageGeneratorLmDolly):
+class LanguageGeneratorLmMosaic(TextGenerationLM):
     def __init__(self, ignored: str = None):
         super().__init__(MODEL_NAME, MODEL_VERSION)
         return
+
+    @classmethod
+    def get_model_names(cls) -> List[str]:
+        raise ["Mosiac-7b-Instruct"]
 
     def setup(self):
         if self.model_name != MODEL_NAME:
@@ -52,12 +56,11 @@ class LanguageGeneratorLmMosaic(LanguageGeneratorLmDolly):
     def _create_lm_answer(
         self, prompt: str, temperature: float, max_tokens: int
     ) -> str:
-        prompt = prompt.strip()
-        in_text = self._create_prompt(prompt).strip()
+        in_text = prompt.strip()
 
         with torch.autocast("cuda", dtype=torch.float16):
             out_text = self.pipeline(
-                in_text, max_new_tokens=248, do_sample=False, use_cache=True
+                in_text, max_new_tokens=248, do_sample=temperature == 0, use_cache=True
             )
             out_text = out_text[0]["generated_text"]
 

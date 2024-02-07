@@ -2,7 +2,6 @@ from typing import Any, Dict, List
 import os
 from app.models.lm import LM
 from app.models.text_generation_lm import TextGenerationLM
-from .dollyv2_lm import LanguageGeneratorLmDolly
 import torch
 from jsonformer import Jsonformer
 import transformers
@@ -58,7 +57,7 @@ class LanguageGeneratorLmRedpajama(TextGenerationLM):
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=max_tokens,
-            do_sample=False,
+            do_sample=temperature == 0,
             return_dict_in_generate=True,
         )
         token = outputs.sequences[0, input_length:]

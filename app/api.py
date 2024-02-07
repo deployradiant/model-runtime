@@ -24,11 +24,22 @@ from .core import (
 import time
 import json
 
+OK_RESPONSE: str = "OK"
+
 router = APIRouter(prefix="/api")
 
 
-@router.post("/answer", response_model=None)
-async def answer_default(
+@router.post("/embedding")
+def embedding(
+    request: EmbedMultipleRequest,
+    model: EmbeddingLM = Depends(get_embedding_model),
+) -> EmbedMultipleResponse:
+    vectors = model.embedding(request.prompts)
+    return EmbedMultipleResponse(embeddings=vectors)
+
+
+@router.post("/text_generation", response_model=None)
+async def text_generation(
     request: ModelRequest,
     model: TextGenerationLM = Depends(get_text_generation_model),
 ) -> ModelResponse | StreamingResponse:
@@ -59,8 +70,8 @@ async def answer_default(
         return ModelResponse(response=model_response)
 
 
-@router.post("/extract")
-async def extract_with_lm(
+@router.post("/extract_json")
+async def extract_json(
     model_request: ExtractRequest,
     model: TextGenerationLM = Depends(get_text_generation_model),
 ) -> ExtractResponse:
@@ -72,18 +83,6 @@ async def extract_with_lm(
     )
 
     return ExtractResponse(response=model_response)
-
-
-@router.post("/embedding/all")
-def embed_multiple_default(
-    request: EmbedMultipleRequest,
-    model: EmbeddingLM = Depends(get_embedding_model),
-) -> EmbedMultipleResponse:
-    vectors = model.embedding(request.prompts)
-    return EmbedMultipleResponse(embeddings=vectors)
-
-
-OK_RESPONSE: str = "OK"
 
 
 @router.post("/set_model_type")
