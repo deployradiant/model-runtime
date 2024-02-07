@@ -25,11 +25,11 @@ The API is intentionally super simple. It support text generation, embedding, js
 Parameters
 ```json
 {
-  "prompt": "string", # The prompt to run 
-  "token_count": 100, # (Optional) Maximum token count
-  "temperature": 0, # (Optional)
-  "verbose": false, # (Optional) Log additional debug information
-  "stream": false # (Optional)
+  "prompt": "string", // The prompt to run 
+  "token_count": 100, // (Optional) Maximum token count
+  "temperature": 0, // (Optional)
+  "verbose": false, // (Optional) Log additional debug information
+  "stream": false // (Optional)
 }
 ```
 
@@ -45,7 +45,7 @@ Parameters
 ```json
 {
   "prompts": [
-    "string" # A list of text strings to embedd.
+    "string" // A list of text strings to embedd.
   ]
 }
 ```
@@ -58,14 +58,14 @@ curl -XPOST http://localhost:8000/api/embedding -H 'content-type: application/js
 ### Fine tuning
 
 Parameters
-```bash
+```json
 {
-  "examples": [  # Example text that the model should be trained on
+  "examples": [  // Example text that the model should be trained on
     "string"
   ],
-  "steps": 100, # Training steps
-  "base_model": "string", # LLM base model
-  "name": "string" # Name of the new finetuned model
+  "steps": 100, // Training steps
+  "base_model": "string", // LLM base model
+  "name": "string" // Name of the new finetuned model
 }
 ```
 
