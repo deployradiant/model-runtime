@@ -22,8 +22,7 @@ class LM(ABC):
         load_from_s3=get_s3_bucket() is not None,
     ):
         self.model_name = model_name
-        # raise ValueError("has s3 bucket", get_s3_bucket() is not None)
-
+        print("this is a set", load_from_s3)
         if load_from_s3:
             self.model_cache, self.tokenizer_cache = load_model_from_s3(
                 self.model_name, has_tokenizer
