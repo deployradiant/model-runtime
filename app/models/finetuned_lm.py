@@ -36,7 +36,7 @@ class FinetunedTextGenerationLm(TextGenerationLM):
                 input_ids=inputs.input_ids,
                 attention_mask=inputs.attention_mask,
                 max_new_tokens=max_tokens,
-                do_sample=False if temperature == 0 else True,
+                do_sample=temperature == 0,
                 temperature=temperature,
             )
             output = self.base_model.tokenizer.decode(
