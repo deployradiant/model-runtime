@@ -5,7 +5,7 @@ from app.types import FinetuningTask
 
 class ModelRequest(BaseModel):
     prompt: str
-    token_count: int = 2000
+    token_count: int = 100
     temperature: float = 0.0
     verbose: bool = False
     stream: bool = False
